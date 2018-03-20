@@ -13,7 +13,7 @@ class PanelForm(forms.ModelForm):
 
     class Meta:
         model = Panel
-        fields = ('panelName', 'panelID', 'username', 'panelVersion', 'gene', 'panelTypes')
+        fields = ('panelName', 'panelID', 'username', 'panelVersion', 'panelTypes')
         labels = {  # Add custom names to modelform labels
             'panelName': 'Panel Name',
             'panelID': 'Panel ID',
@@ -22,18 +22,15 @@ class PanelForm(forms.ModelForm):
             'panelTypes': 'Panel Type',
         }
 
+    gene1 = forms.CharField(max_length=255)
 
-class LogForm(forms.ModelForm):
+    # def clean_gene(self):
+    #     gene = self.cleaned_data['gene'].strip(';')
+    #     return gene
 
-    class Meta:
-        model = LogChanges
-        fields = ('prevUsername', 'prevPanelName', 'prevPanelID', 'prevPanelVersion')
-        labels = {  # Add custom names to modelform labels
-            'prevUsername': 'Previous Username',
-            'prevPanelName': 'Previous Panel Name',
-            'prevPanelID': 'Previous Panel ID',
-            'prevPanelVersion': 'Previous Panel Version',
-        }
+    def __init__(self, *args, **kwargs):
+        super(PanelForm, self).__init__(*args, **kwargs)
+        self.fields['gene1'].widget.attrs.update({'id': 'gene_list'})
 
 
 class SubpanelForm(forms.ModelForm):
@@ -54,8 +51,21 @@ class SubpanelForm(forms.ModelForm):
         parent_panel = kwargs.pop('parent_panel')
         print(type(parent_panel))
         super(SubpanelForm, self).__init__(*args, **kwargs)
-        # query if gene in parent_panel (Panel)
+        # Query if the gene is in the parent_panel (Panel)
         if parent_panel:
             self.fields['gene'].queryset = HUGOgene.objects.filter(panel__id=int(parent_panel))
         else:
             pass
+
+
+class LogForm(forms.ModelForm):
+
+    class Meta:
+        model = LogChanges
+        fields = ('prevUsername', 'prevPanelName', 'prevPanelID', 'prevPanelVersion')
+        labels = {  # Add custom names to modelform labels
+            'prevUsername': 'Previous Username',
+            'prevPanelName': 'Previous Panel Name',
+            'prevPanelID': 'Previous Panel ID',
+            'prevPanelVersion': 'Previous Panel Version',
+        }

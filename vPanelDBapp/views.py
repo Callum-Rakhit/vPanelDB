@@ -16,6 +16,7 @@ def home_page(request):
 
 @login_required
 def panel_new(request):
+    gene_list = HUGOgene.objects.all()
     if request.method == "POST":
         form = PanelForm(request.POST)
         if form.is_valid():
@@ -25,16 +26,19 @@ def panel_new(request):
     else:
         form = PanelForm()
         title = "Add a new panel"
+
     context = {
         "title": title,
-        'form': form
+        'form': form,
+        'gene_list': gene_list
     }
-    return render(request, 'vPanelDBapp/panel_edit.html', {'form': form})
+    return render(request, 'vPanelDBapp/panel_edit.html', context)
 
 
 @login_required
 def panel_edit(request, pk):
     panel = get_object_or_404(Panel, pk=pk)
+    gene_list = HUGOgene.objects.all()
     if request.method == "POST":
         form = PanelForm(request.POST, instance=panel)
         if form.is_valid():
@@ -43,7 +47,12 @@ def panel_edit(request, pk):
             return redirect('panel_detail', pk=panel.pk)
     else:
         form = PanelForm(instance=panel)
-    return render(request, 'vPanelDBapp/panel_edit.html', {'form': form})
+
+    context = {
+        'form': form,
+        'gene_list': gene_list
+    }
+    return render(request, 'vPanelDBapp/panel_edit.html', context)
 
 
 def panel_detail(request, pk):
